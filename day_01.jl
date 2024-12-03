@@ -9,16 +9,10 @@ parsed_lines = parse_line.(lines)
 array1 = (x -> x[1]).(parsed_lines)
 array2 = (x -> x[2]).(parsed_lines)
 
-sort!(array1)
-sort!(array2)
-
-part1_answer = array1 .- array2 .|> abs |> sum
+part1_answer = sort(array1) .- sort(array2) .|> abs |> sum
 println("part 1 answer: $part1_answer")
 
-# Part 2 (don't want the arrays sorted this time)
-array1 = (x -> x[1]).(parsed_lines)
-array2 = (x -> x[2]).(parsed_lines)
-
+# Part 2
 counts = [sum(x .== array2) for x in array1]
 part2_answer = counts .* array1 |> sum
 
