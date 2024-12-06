@@ -1,6 +1,6 @@
 # Setup
-# lines = readlines("./tests/day_04.txt")
 lines = readlines("./puzzle_inputs/day_04.txt")
+grid = parse_input_as_matrix(lines)
 
 # function definitions
 function parse_input_as_matrix(lines)
@@ -8,7 +8,7 @@ function parse_input_as_matrix(lines)
 end
 
 function count_xmas(chars) 
-    matches = eachmatch(r"(XMAS|SAMX)", string(join(chars)), overlap=true)
+    matches = eachmatch(r"(XMAS|SAMX)", join(chars), overlap=true)
     return matches |> collect |> length |> sum
 end
 
@@ -57,59 +57,30 @@ function create_offset(grid, how="left")
 end
 
 # part 1
-grid = parse_input_as_matrix(lines)
 part1_answer = count_xmas(grid)
 println("Part 1 answer: $part1_answer")    
-    
-# part 2
-    
-#  count_xmas_crossed(grid)
-#     left_diags = create_offset(grid, "left")
-#     right_diags = create_offset(grid, "left")
-#     regex = r"MAS|SAM"
-# end
 
-"""
-column 4 in the first matches with column end-9 = 10 in the second
-So I just need to align the columns somehow, and if there are two vertical matches
-in the same place (row index), then it's a valid X
+# part 2  - Really hackish way to do it, but I couldn't get a more elegant
+# solution using regex or the left_diag / right_diag approach from part 1 :/
+lines = readlines("./puzzle_inputs/day_04.txt")
+grid = parse_input_as_matrix(lines)
 
-"""
-test = """..........
-..A.......
-......BC..
-..D.E.....
-..........
-..........
-..........
-.F.G.H.I..
-..........
-.........."""
-test = """....AB....
-....AB....
-....AB....
-....AB....
-....AB....
-....AB....
-....AB....
-....AB....
-....AB....
-....AB...."""
+function is_valid_MAS(a, b, c)
+    return a == 'A' && ((b == 'M' && c == 'S') || (b == 'S' && c == 'M'))
+end
 
-9
-7
-5
-3
-1
-1
-3
-5
-7
-9
+m, n = size(grid)
 
-test = parse_input_as_matrix(split(test, "\n"))
-
-left_diags = create_offset(test, "left")
-right_diags = create_offset(test, "right")
-
-
+valid_matches = 0
+for i in 2:(m-1)
+    for j in 2:(n-1)
+        point = grid[i, j]
+        top_left = grid[i-1, j-1]
+        top_right = grid[i-1, j+1]
+        bottom_left = grid[i+1, j-1]
+        bottom_right = grid[i+1, j+1]
+        valid_matches += (is_valid_MAS(point, top_left, bottom_right) &&
+                          is_valid_MAS(point, top_right, bottom_left))
+    end
+end
+println("Part 2 answer: $valid_matches")
